@@ -3,10 +3,6 @@ from dataclasses import dataclass
 from typing import Callable, Union
 
 
-# Function_f: TypeAlias = Callable[[np.array, np.array], np.array]
-# Function_u: TypeAlias = Callable[[np.array], np.array]
-
-
 """
 ODE:
 u' = f(u, t)
@@ -59,31 +55,18 @@ problem_nonatonomous_1 = ODEModel(
     T = np.array([2.]), 
     y0 = np.array([1.])
 )
-
-
-g = 13.7503671636040745,
-l = 1.,
-# 4) Nonlinear
-problem_nonlinear_1 = ODEModel(    
-    f = lambda t, y: np.array([y[1], -(13.7503671636040745 / 1.) * np.sin(y[0])]), 
+problem_nonatonomous_2 = ODEModel(
+    f = lambda t, y: y * (5 - 7 * t), 
     exact_test_solution = None, 
     t0 = np.array([0.]), 
     T = np.array([2.]), 
-    y0 = np.array([np.pi / 2., 0.])
+    y0 = np.array([1.])
 )
 
 
-# in future works (maybe next week):
-
-problem_2 = ODEModel(
-    f = lambda t, y: -5. * y + 3 * np.exp(t), 
-    exact_test_solution = lambda t: 5 * np.exp(5. * t), 
-    t0 = np.array([0]), 
-    T = np.array([3]), 
-    y0 = np.array([5. / 2.])
-)
 
 
+# bad solution:
 problem_3 = ODEModel(
     f = lambda t, y: np.exp(2 * t) / np.exp(y), 
     exact_test_solution = lambda t: np.log10(np.exp(2 * t) / 2. + np.exp(4) / 2.), 
@@ -91,12 +74,3 @@ problem_3 = ODEModel(
     T = np.array([5.]), 
     y0 = np.array([4.])
 )
-
-problem_4 = ODEModel(
-    f = lambda t, y: np.sin(y) / 10. + 10. * np.pi * np.cos(10. * np.pi * t) - np.sin((t + 1.)**(3. / 2.) + np.sin(10. * np.pi * t)) / 10. + 3.* (t + 1) ** (1. / 2.) / 2., 
-    exact_test_solution = lambda t: (t + 1)**(3. / 2.) + np.sin(10 * np.pi * t), 
-    t0 = np.array([0.]), 
-    T = np.array([2.]), 
-    y0 = np.array([1.])
-)
-

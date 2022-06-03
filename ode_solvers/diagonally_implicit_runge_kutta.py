@@ -5,11 +5,15 @@ from autograd import grad, jacobian
 from scipy import linalg
 
 from .implicit_runge_kutta import ImplicitRungeKutta
+from ode_models import ODEModel
 
 
-class SinglyDiagonallyImplicitRungeKuttaMethod(ImplicitRungeKutta):
+class DiagonallyImplicitRungeKutta(ImplicitRungeKutta):
 
-    def phi_solve(self, t0, y0, init_val, J, M):
+    def __init__(self, ode_problem: ODEModel, A: np.array, b: np.array, c: np.array, tolerance: float):
+        super().__init__(ode_problem, A, b, c, tolerance)
+
+    def phi_solve(self, current_time, current_y, init_val, J, M):
         """
         This function solves F(Y_i)=0 by solving s systems of size m 
             x m each.
@@ -27,10 +31,10 @@ class SinglyDiagonallyImplicitRungeKuttaMethod(ImplicitRungeKutta):
         -------------
         The stage derivative Y’_i
         """
-        JJ = np.eye(self.m) - self.h * self.A[0,0] * J
+        JJ = np.eye(self.num_init_conditions) - self.h * self.A[0,0] * J
         lu_factor = linalg.lu_factor(JJ)
         for i in range(M):
-            init_val, norm_d = self.phi_newtonstep(t0, y0, init_val, J, lu_factor)
+            init_val, norm_d = self.phi_newtonstep(current_time, current_y, init_val, J, lu_factor)
             if norm_d < self.tol:
                 break
             elif i == M - 1:
@@ -39,7 +43,7 @@ class SinglyDiagonallyImplicitRungeKuttaMethod(ImplicitRungeKutta):
 
     
 
-    def phi_newtonstep(self, t0, y0, init_val, J, lu_factor):
+    def phi_newtonstep(self, current_time, current_y, init_val, J, lu_factor):
         """
         Takes one Newton step by solvning
         G’(Y_i)(Y^(n+1)_i-Y^(n)_i)=-G(Y_i)
@@ -56,10 +60,10 @@ class SinglyDiagonallyImplicitRungeKuttaMethod(ImplicitRungeKutta):
         The difference Y^(n+1)_i-Y^(n)_i
         """
         x = []
-        for i in range(self.s): # solving the s mxm systems
+        for i in range(self.s):  # solving the s mxm systems
             rhs = -self.F(
-                init_val.flatten(), t0, y0
-            )[i * self.m : (i + 1) * self.m] + np.sum(
+                init_val.flatten(), current_time, current_y
+            )[i * self.num_init_conditions : (i + 1) * self.num_init_conditions] + np.sum(
                 [self.h * self.A[i,j] * J @ x[j] for j in range(i)],
                 axis = 0
             )

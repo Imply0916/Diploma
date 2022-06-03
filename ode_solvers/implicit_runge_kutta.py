@@ -3,9 +3,14 @@ from autograd import grad, jacobian
 from scipy import linalg
 
 from .ode_solver import ODESolver
+from ode_models import ODEModel
 
 
 class ImplicitRungeKutta(ODESolver):
+
+    def __init__(self, ode_problem: ODEModel, A: np.array, b: np.array, c: np.array, tolerance: float):
+        super().__init__(ode_problem, A, b, c, tolerance)
+
 
     def phi(self, t0, y0):
         """
@@ -17,14 +22,14 @@ class ImplicitRungeKutta(ODESolver):
         t0 = float, current timestep
         y0 = 1 x m vector, the last solution y_n. Where m is the length of the initial condition y_0 of the IVP.
         """
-        M = 1000 # max number of newton iterations
+        M = 1000  # max number of newton iterations
 
-        stage_der = np.array(self.s * [self.f(t0, y0)]) # initial value: Y’_0
+        stage_der = np.array(self.s * [self.f(t0, y0)])  # initial value: Y’_0
         J = jacobian(self.f)(t0, y0)
         stage_val = self.phi_solve(t0, y0, stage_der, J, M)
 
         return np.array([
-            self.b @ stage_val.reshape(self.s,self.m)[:,j] for j in range(self.m)
+            self.b @ stage_val.reshape(self.s, self.num_init_conditions)[:,j] for j in range(self.num_init_conditions)
         ])
 
     def phi_solve(self, t0, y0, init_val, J, M):
@@ -42,7 +47,7 @@ class ImplicitRungeKutta(ODESolver):
         The stage derivative Y’_i
         """
 
-        JJ = np.eye(self.s * self.m) - self.h * np.kron(self.A, J)
+        JJ = np.eye(self.s * self.num_init_conditions) - self.h * np.kron(self.A, J)
         lu_factor = linalg.lu_factor(JJ)
         for i in range(M):
             init_val, norm_d = self.phi_newtonstep(t0, y0, init_val, lu_factor)
@@ -81,11 +86,11 @@ class ImplicitRungeKutta(ODESolver):
         t0 = float, current timestep
         y0 = 1 x m vector, the last solution y_n. Where m is the length of the initial condition y_0 of the IVP.
         """
-        stage_der_new = np.empty((self.s,self.m)) # the i:th stage_der is on the i:th row
-        for i in range(self.s): # iterate over all stage_der
+        stage_der_new = np.empty((self.s, self.num_init_conditions))  # the i:th stage_der is on the i:th row
+        for i in range(self.s):  # iterate over all stage_der
             stageVal = y0 + np.array([
                 self.h * np.dot(self.A[i,:],
-                stage_der.reshape(self.s, self.m)[:, j]) for j in range(self.m)
+                stage_der.reshape(self.s, self.num_init_conditions)[:, j]) for j in range(self.num_init_conditions)
             ])
-            stage_der_new[i, :] = self.f(t0 + self.c[i] * self.h, stageVal) # the ith stage_der is set on the ith row
+            stage_der_new[i, :] = self.f(t0 + self.c[i] * self.h, stageVal)  # the ith stage_der is set on the ith row
         return stage_der - stage_der_new.reshape(-1)
