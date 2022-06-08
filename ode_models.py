@@ -15,7 +15,7 @@ class ODEModel:
     t0: np.array  # because we made general solve methods for arbitrary dimentions, then start point may be in 3-dim t0 = (2, 4, 5)
     T: np.array  # because we made general solve methods for arbitrary dimentions, then end point may be in 3-dim T = (6, 1, 0)
     y0: np.array  # value in t0 point, also for arbitrary dimentions
-    number_of_points_to_discretization: int = 100
+    number_of_points_to_discretization: int = 250
 
 
 #####################################################################################################################################
@@ -30,7 +30,7 @@ problem_scalar_1 = ODEModel(
 )
 
 
-problem__scalar_2 = ODEModel(
+problem_scalar_2 = ODEModel(
     f = lambda t, y: -5. * y, 
     exact_test_solution = lambda t: np.exp(- 5. * t), 
     t0 = np.array([0]), 
@@ -39,15 +39,8 @@ problem__scalar_2 = ODEModel(
 )
 
 
-#####################################################################################################################################
-# 2)  System of Differential Equations
-
 #=====================
-# 2.1) 
-
-
-#=====================
-#  3) Nonautonomous ODE
+#  2) Nonautonomous ODE
 problem_nonatonomous_1 = ODEModel(
     f = lambda t, y: y * (1 - 2 * t), 
     exact_test_solution = lambda t: np.exp(t - t ** 2), 
@@ -56,20 +49,28 @@ problem_nonatonomous_1 = ODEModel(
     y0 = np.array([1.])
 )
 problem_nonatonomous_2 = ODEModel(
-    f = lambda t, y: y * (5 - 7 * t), 
-    exact_test_solution = None, 
+    f = lambda t, y: (y + 1) * (5 - 7 * t**2), 
+    exact_test_solution = lambda t: 3.8 * np.exp(5 * t - 7 * t**3 / 3) - 1, 
     t0 = np.array([0.]), 
     T = np.array([2.]), 
-    y0 = np.array([1.])
+    y0 = np.array([3.])
 )
 
 
+#=====================
+# 3)  Nonlinear
+problem_nonlinear_1 = ODEModel(
+    f = lambda t, y: np.sin(t) + y, 
+    exact_test_solution = lambda t: 3 * np.exp(t) / 2 - np.sin(t) / 2 - np.cos(t) / 2 ,  
+    t0 = np.array([0]), 
+    T = np.array([3]), 
+    y0 = np.array([1])
+)
 
 
-# bad solution:
-problem_3 = ODEModel(
+problem_nonlinear_2 = ODEModel(
     f = lambda t, y: np.exp(2 * t) / np.exp(y), 
-    exact_test_solution = lambda t: np.log10(np.exp(2 * t) / 2. + np.exp(4) / 2.), 
+    exact_test_solution = lambda t: np.log(np.exp(2 * t) / 2. + np.exp(4) / 2), 
     t0 = np.array([2.]), 
     T = np.array([5.]), 
     y0 = np.array([4.])

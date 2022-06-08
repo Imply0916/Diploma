@@ -27,7 +27,7 @@ def solve_ode_test(
     ode_problem: ODEModel,          # differential problem, which we want to solve
     tol=1e-5                        # tolerance
 ):
-    test_explicit_methods = [ForwardEuler, KuttaThirdOrderMethod]
+    test_explicit_methods = [ExplicitMidpointMethod, KuttaThirdOrderMethod]
     tests_implicit_methods = [GaussLegendreSixOrder, CrankNicolsonMethodSecondOrder]
     tests_diagonally_implicit_methods = [DIRKThirdOrder, DIRKFourOrder]
     
@@ -44,7 +44,7 @@ def solve_ode_test(
         row_wise=True
     )
 
-    noise = 0.01  # add some noise in order to look at solution when he very good)
+    noise = 0.01  # adding some noise in order to look at solution when he very good)
     
     # EXPLISIT METHODS
     for k, method in enumerate(test_explicit_methods):
@@ -101,24 +101,42 @@ def solve_ode_test(
     plt.show()
 
 
-def example_1():
+
+
+# Examples: 
+
+
+def example_simple_equetion_scalar_ode():
     problems = [
         problem_scalar_1, 
-        problem__scalar_2, 
-        problem_nonatonomous_1,
+        problem_scalar_2
     ]
-
     # solve problems all avalible methods:
     for problem in problems:
         solve_ode_test(ode_problem=problem)
 
 
-def example_2():
-    # without exact solution
-    solve_ode_test(ode_problem=problem_nonatonomous_2)
+def example_nonautonomous_ode():
+    problems = [
+        problem_nonatonomous_1,
+        problem_nonatonomous_2
+    ]
+    # solve problems all avalible methods:
+    for problem in problems:
+        solve_ode_test(ode_problem=problem)
+
+
+def example_nonlinear_ode_1():
+    solve_ode_test(ode_problem=problem_nonlinear_1)
+
+
+def example_nonlinear_ode_2():
+    solve_ode_test(ode_problem=problem_nonlinear_2)
+
 
 
 if __name__ == "__main__":
-    example_1()
-    example_2()
-    
+    example_simple_equetion_scalar_ode()
+    example_nonautonomous_ode()
+    example_nonlinear_ode_1()
+    example_nonlinear_ode_2()

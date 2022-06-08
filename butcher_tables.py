@@ -71,7 +71,7 @@ def DIRKThirdOrder():  # order 4
         [-1/2, -1/2, 1/2, 0],
         [3/2, -3/2, 1/2, 1/2],
     ])
-    b = np.array([3/2, -3/3, 1/2, 1/2])
+    b = np.array([3/2, -3/2, 1/2, 1/2])
     c = np.array([1/2, 2/3, 1/2, 1])
 
     return A, b, c

@@ -15,10 +15,11 @@ class ExplicitRungeKutta(ODESolver):
     def phi(self, current_time, current_y):
         K = np.zeros(self.s, dtype=float)
         for s in range(self.s):
-            x = current_time + self.c[s] * self.h
+            t = current_time + self.c[s] * self.h
             y = current_y
             for j in range(s):
                 y += self.A[s, j] * K[j] * self.h
-            K[s] = self.f(x, y)
+            K[s] = self.f(t, y)
         
-        return self.h * np.sum(K.T @ self.b)
+        return self.h * K.T @ self.b
+        
